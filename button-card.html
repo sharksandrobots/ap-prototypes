@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button &amp; Card Prototype</title>
+    <link rel="stylesheet" href="styles/tokens.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            padding: var(--spacing-spacing-500);
+            background-color: var(--color-backgrounds-secondary);
+            color: var(--color-text-primary);
+        }
+
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+
+        /* Card */
+        .card {
+            background-color: var(--color-backgrounds-elevated);
+            border: var(--layout-stroke-stroke-01) solid var(--color-elements-border-subtle);
+            border-radius: var(--layout-border-radius-md);
+            padding: var(--spacing-spacing-500);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-400);
+        }
+
+        .card__eyebrow {
+            font-size: var(--text-text-size-metadata);
+            font-weight: var(--text-font-weight-medium);
+            color: var(--color-text-eyebrow-default);
+            text-transform: uppercase;
+            letter-spacing: var(--text-letter-spacing-wide);
+        }
+
+        .card__headline {
+            font-size: var(--text-size-x-scale-x1);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-primary);
+            line-height: 1.2;
+        }
+
+        .card__body {
+            font-size: var(--text-text-size-body-base);
+            font-weight: var(--text-font-weight-regular);
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .card__divider {
+            height: var(--layout-stroke-stroke-01);
+            background-color: var(--color-elements-border-subtle);
+            width: 100%;
+        }
+
+        .card__actions {
+            display: flex;
+            gap: var(--spacing-spacing-300);
+        }
+
+        /* Button — filled variant */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-spacing-300) var(--spacing-spacing-600);
+            font-size: var(--text-text-size-body-sm);
+            font-weight: var(--text-font-weight-medium);
+            border-radius: var(--layout-border-radius-sm);
+            border: var(--layout-stroke-stroke-02) solid transparent;
+            cursor: pointer;
+            transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+            font-family: inherit;
+        }
+
+        .btn--filled {
+            background-color: var(--color-interactive-filled-background-enabled-bg);
+            color: var(--color-interactive-filled-label-enabled-label);
+        }
+
+        .btn--filled:hover {
+            background-color: var(--color-interactive-filled-background-hover-bg);
+        }
+
+        .btn--filled:active {
+            background-color: var(--color-interactive-filled-background-active-bg);
+        }
+
+        /* Button — outlined variant */
+        .btn--outlined {
+            background-color: var(--color-interactive-outlined-background-enabled-bg);
+            color: var(--color-interactive-outlined-label-enabled-label);
+            border-color: var(--color-interactive-outlined-border-enabled-border);
+        }
+
+        .btn--outlined:hover {
+            background-color: var(--color-interactive-outlined-background-hover-bg);
+            border-color: var(--color-interactive-outlined-border-hover-border);
+        }
+
+        .btn--outlined:active {
+            background-color: var(--color-interactive-outlined-background-active-bg);
+        }
+
+        /* Notification bar */
+        .notification {
+            display: none;
+            align-items: center;
+            gap: var(--spacing-spacing-300);
+            padding: var(--spacing-spacing-300) var(--spacing-spacing-500);
+            border-radius: var(--layout-border-radius-sm);
+            font-size: var(--text-text-size-body-sm);
+            margin-bottom: var(--spacing-spacing-500);
+            border: var(--layout-stroke-stroke-01) solid var(--color-success-border);
+            background-color: var(--color-success-background);
+            color: var(--color-success-text);
+        }
+
+        .notification.is-visible {
+            display: flex;
+        }
+
+        .notification__close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: var(--text-text-size-body-base);
+            color: var(--color-icons-primary-enabled);
+            padding: var(--spacing-spacing-100);
+        }
+
+        /* Responsive: mobile-first, breakpoints at 390px, 768px, 1024px */
+
+        /* Base (< 390px) */
+        .card {
+            padding: var(--spacing-spacing-400);
+        }
+
+        .card__headline {
+            font-size: var(--text-size-x-scale-x-base);
+        }
+
+        .card__actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        /* 390px — small phones */
+        @media (min-width: 390px) {
+            body {
+                padding: var(--spacing-spacing-600);
+            }
+
+            .card {
+                padding: var(--spacing-spacing-500);
+            }
+
+            .card__headline {
+                font-size: var(--text-size-x-scale-x1);
+            }
+        }
+
+        /* 768px — tablets */
+        @media (min-width: 768px) {
+            body {
+                padding: var(--spacing-spacing-800);
+            }
+
+            .card {
+                padding: var(--spacing-spacing-700);
+                gap: var(--spacing-spacing-500);
+            }
+
+            .card__headline {
+                font-size: var(--text-size-x-scale-x2);
+            }
+
+            .card__actions {
+                flex-direction: row;
+            }
+
+            .btn {
+                width: auto;
+            }
+        }
+
+        /* 1024px — desktop */
+        @media (min-width: 1024px) {
+            body {
+                padding: var(--spacing-spacing-900);
+            }
+
+            .card {
+                padding: var(--spacing-spacing-800);
+            }
+
+            .card__headline {
+                font-size: var(--text-size-x-scale-x3);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="notification" class="notification">
+            <span id="notification-text"></span>
+            <button class="notification__close" aria-label="Close notification" onclick="dismissNotification()">&times;</button>
+        </div>
+
+        <div class="card">
+            <span class="card__eyebrow">Prototype</span>
+            <h2 class="card__headline">Button &amp; Card Component</h2>
+            <p class="card__body">
+                A simple card built with AP News design tokens. The filled and outlined
+                button variants below use the interactive token palette for all states.
+                Resize the browser to see the responsive breakpoints at 390px, 768px,
+                and 1024px.
+            </p>
+            <div class="card__divider"></div>
+            <div class="card__actions">
+                <button class="btn btn--filled" onclick="handleClick('filled')">Read More</button>
+                <button class="btn btn--outlined" onclick="handleClick('outlined')">Save for Later</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleClick(variant) {
+            var messages = {
+                filled: 'Opening full story\u2026',
+                outlined: 'Story saved to your reading list.'
+            };
+            var el = document.getElementById('notification');
+            var text = document.getElementById('notification-text');
+            text.textContent = messages[variant] || 'Action triggered.';
+            el.classList.add('is-visible');
+        }
+
+        function dismissNotification() {
+            document.getElementById('notification').classList.remove('is-visible');
+        }
+    </script>
+</body>
+</html>
