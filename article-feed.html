@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AP News — Article Feed</title>
+    <link rel="stylesheet" href="styles/tokens.css">
+    <link rel="stylesheet" href="styles/fonts.css">
+    <style>
+        /* ================================================================
+           Reset
+           ================================================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul, ol { list-style: none; }
+
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        /* ================================================================
+           Body
+           ================================================================ */
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--color-backgrounds-primary);
+            color: var(--color-text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ================================================================
+           Header
+           ================================================================ */
+        .header {
+            background-color: var(--color-backgrounds-header-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header__inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--spacing-screen-margins);
+            height: var(--layout-size-size-48);
+        }
+
+        /* AP logo */
+        .header__logo {
+            flex-shrink: 0;
+            margin-right: var(--spacing-spacing-700);
+        }
+
+        .header__logo svg {
+            display: block;
+            width: 36px;
+            height: 40px;
+        }
+
+        /* Primary nav */
+        .header__nav {
+            display: none;
+            align-items: center;
+            gap: var(--spacing-spacing-500);
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        .header__nav-link {
+            font-size: var(--text-text-size-nav-link);
+            font-weight: var(--text-font-weight-medium);
+            color: var(--color-text-header);
+            white-space: nowrap;
+            padding: var(--spacing-spacing-200) 0;
+            transition: color 0.15s;
+        }
+
+        .header__nav-link:hover {
+            color: var(--color-text-inverse-primary);
+        }
+
+        .header__nav-link--active {
+            color: var(--color-text-inverse-primary);
+            border-bottom: var(--layout-stroke-stroke-02) solid var(--color-brand-ap-brand-red);
+        }
+
+        /* Utility icons */
+        .header__actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-spacing-300);
+            margin-left: auto;
+        }
+
+        .header__icon-btn {
+            width: var(--layout-size-size-32);
+            height: var(--layout-size-size-32);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-icons-inverse-inverse-enabled);
+            border-radius: var(--layout-border-radius-sm);
+            transition: color 0.15s;
+        }
+
+        .header__icon-btn:hover {
+            color: var(--color-icons-inverse-inverse-hovered);
+        }
+
+        .header__icon-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Mobile menu toggle */
+        .header__menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--layout-size-size-32);
+            height: var(--layout-size-size-32);
+            color: var(--color-icons-inverse-inverse-enabled);
+        }
+
+        .header__menu-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* ================================================================
+           Mobile nav drawer
+           ================================================================ */
+        .mobile-nav {
+            display: none;
+            background-color: var(--color-backgrounds-header-secondary);
+            padding: var(--spacing-spacing-400) var(--spacing-screen-margins);
+        }
+
+        .mobile-nav.is-open {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-300);
+        }
+
+        .mobile-nav__link {
+            font-size: var(--text-text-size-body-base);
+            font-weight: var(--text-font-weight-medium);
+            color: var(--color-text-header);
+            padding: var(--spacing-spacing-200) 0;
+            border-bottom: var(--layout-stroke-stroke-01) solid var(--color-backgrounds-header-primary);
+        }
+
+        .mobile-nav__link:last-child {
+            border-bottom: none;
+        }
+
+        /* ================================================================
+           Main layout
+           ================================================================ */
+        .main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: var(--spacing-spacing-500) var(--spacing-screen-margins);
+        }
+
+        /* ================================================================
+           Hero — featured story
+           ================================================================ */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-400);
+            padding-bottom: var(--spacing-spacing-600);
+            border-bottom: var(--layout-stroke-stroke-01) solid var(--color-elements-border-subtle);
+            margin-bottom: var(--spacing-spacing-600);
+        }
+
+        .hero__image-wrap {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: var(--color-backgrounds-secondary);
+            border-radius: var(--layout-border-radius-sm);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero__image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero__image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            font-size: var(--text-text-size-metadata);
+        }
+
+        .hero__content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-300);
+        }
+
+        .hero__eyebrow {
+            font-size: var(--text-text-size-metadata);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-eyebrow-default);
+            text-transform: uppercase;
+            letter-spacing: var(--text-letter-spacing-wide);
+        }
+
+        .hero__headline {
+            font-size: var(--text-size-special-story-page-headline-sm);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-primary);
+            line-height: 1.2;
+        }
+
+        .hero__headline a:hover {
+            color: var(--color-text-primary-hover);
+        }
+
+        .hero__description {
+            font-size: var(--text-text-size-body-sm);
+            font-weight: var(--text-font-weight-regular);
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .hero__meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-spacing-200);
+            font-size: var(--text-text-size-metadata);
+            color: var(--color-text-secondary);
+        }
+
+        .hero__meta-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: var(--color-text-secondary);
+        }
+
+        /* ================================================================
+           Section title
+           ================================================================ */
+        .section-title {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-300);
+            margin-bottom: var(--spacing-spacing-500);
+        }
+
+        .section-title__rule {
+            height: var(--layout-stroke-stroke-02);
+            background-color: var(--color-elements-border-bold);
+            width: 100%;
+        }
+
+        .section-title__text {
+            font-size: var(--text-size-x-scale-x1);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-primary);
+            line-height: 1.2;
+        }
+
+        /* ================================================================
+           Story cards — grid
+           ================================================================ */
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-spacing-600);
+            margin-bottom: var(--spacing-spacing-800);
+        }
+
+        /* Card */
+        .story-card {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-300);
+        }
+
+        .story-card__image-wrap {
+            width: 100%;
+            aspect-ratio: 3 / 2;
+            background-color: var(--color-backgrounds-secondary);
+            border-radius: var(--layout-border-radius-sm);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .story-card__image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-card__image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            font-size: var(--text-text-size-metadata);
+        }
+
+        .story-card__content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-200);
+        }
+
+        .story-card__eyebrow {
+            font-size: var(--text-text-size-metadata);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-eyebrow-default);
+            text-transform: uppercase;
+            letter-spacing: var(--text-letter-spacing-wide);
+        }
+
+        .story-card__headline {
+            font-size: var(--text-text-size-body-base);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-primary);
+            line-height: 1.3;
+        }
+
+        .story-card__headline a:hover {
+            color: var(--color-text-primary-hover);
+        }
+
+        .story-card__description {
+            font-size: var(--text-text-size-body-sm);
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+            display: none;
+        }
+
+        .story-card__meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-spacing-200);
+            font-size: var(--text-text-size-metadata);
+            color: var(--color-text-secondary);
+        }
+
+        .story-card__meta-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: var(--color-text-secondary);
+        }
+
+        /* ================================================================
+           Horizontal story list (compact row)
+           ================================================================ */
+        .story-row {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-400);
+            padding-top: var(--spacing-spacing-600);
+            border-top: var(--layout-stroke-stroke-01) solid var(--color-elements-border-subtle);
+            margin-bottom: var(--spacing-spacing-800);
+        }
+
+        .story-row__item {
+            display: flex;
+            gap: var(--spacing-spacing-300);
+            padding-bottom: var(--spacing-spacing-400);
+            border-bottom: var(--layout-stroke-stroke-01) solid var(--color-elements-border-subtle);
+        }
+
+        .story-row__item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .story-row__image-wrap {
+            flex-shrink: 0;
+            width: 96px;
+            height: 64px;
+            background-color: var(--color-backgrounds-secondary);
+            border-radius: var(--layout-border-radius-sm);
+            overflow: hidden;
+        }
+
+        .story-row__image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-row__content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-100);
+            min-width: 0;
+        }
+
+        .story-row__eyebrow {
+            font-size: var(--text-text-size-utility-sm);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-eyebrow-default);
+            text-transform: uppercase;
+            letter-spacing: var(--text-letter-spacing-wide);
+        }
+
+        .story-row__headline {
+            font-size: var(--text-text-size-body-sm);
+            font-weight: var(--text-font-weight-bold);
+            color: var(--color-text-primary);
+            line-height: 1.3;
+        }
+
+        .story-row__headline a:hover {
+            color: var(--color-text-primary-hover);
+        }
+
+        .story-row__meta {
+            font-size: var(--text-text-size-metadata);
+            color: var(--color-text-secondary);
+        }
+
+        /* ================================================================
+           Footer
+           ================================================================ */
+        .footer {
+            background-color: var(--color-backgrounds-header-primary);
+            padding: var(--spacing-spacing-700) var(--spacing-screen-margins);
+        }
+
+        .footer__inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-spacing-500);
+        }
+
+        .footer__logo svg {
+            width: 36px;
+            height: 40px;
+        }
+
+        .footer__links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-spacing-400) var(--spacing-spacing-600);
+        }
+
+        .footer__link {
+            font-size: var(--text-text-size-body-sm);
+            font-weight: var(--text-font-weight-regular);
+            color: var(--color-text-header);
+            transition: color 0.15s;
+        }
+
+        .footer__link:hover {
+            color: var(--color-text-inverse-primary);
+        }
+
+        .footer__divider {
+            height: var(--layout-stroke-stroke-01);
+            background-color: var(--color-backgrounds-header-secondary);
+        }
+
+        .footer__copyright {
+            font-size: var(--text-text-size-metadata);
+            color: var(--color-text-secondary);
+        }
+
+        /* ================================================================
+           Responsive — 390px  (small phones)
+           ================================================================ */
+        @media (min-width: 390px) {
+            .main {
+                padding: var(--spacing-spacing-600) var(--spacing-screen-margins);
+            }
+
+            .hero__headline {
+                font-size: var(--text-size-special-story-page-headline-md);
+            }
+
+            .story-card__headline {
+                font-size: var(--text-size-x-scale-x1);
+            }
+
+            .story-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ================================================================
+           Responsive — 768px  (tablets)
+           ================================================================ */
+        @media (min-width: 768px) {
+            .header__inner {
+                height: var(--layout-size-size-56);
+                padding: 0 var(--spacing-spacing-700);
+            }
+
+            .header__nav {
+                display: flex;
+            }
+
+            .header__menu-btn {
+                display: none;
+            }
+
+            .main {
+                padding: var(--spacing-spacing-700);
+            }
+
+            /* Hero becomes horizontal */
+            .hero {
+                flex-direction: row;
+                gap: var(--spacing-spacing-600);
+            }
+
+            .hero__image-wrap {
+                flex: 3;
+                aspect-ratio: 3 / 2;
+            }
+
+            .hero__content {
+                flex: 2;
+                justify-content: center;
+            }
+
+            .hero__headline {
+                font-size: var(--text-size-special-story-page-headline-md);
+            }
+
+            .hero__description {
+                font-size: var(--text-text-size-body-base);
+            }
+
+            .story-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .story-card__description {
+                display: block;
+            }
+
+            /* Horizontal list in row */
+            .story-row {
+                flex-direction: row;
+                gap: var(--spacing-spacing-500);
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+
+            .story-row__item {
+                flex-direction: column;
+                flex: 1;
+                min-width: 180px;
+                padding-bottom: 0;
+                border-bottom: none;
+                border-right: var(--layout-stroke-stroke-01) solid var(--color-elements-border-subtle);
+                padding-right: var(--spacing-spacing-500);
+            }
+
+            .story-row__item:last-child {
+                border-right: none;
+                padding-right: 0;
+            }
+
+            .story-row__image-wrap {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 3 / 2;
+            }
+
+            .footer__inner {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .footer__links {
+                flex: 1;
+            }
+
+            .footer__divider {
+                width: 100%;
+            }
+        }
+
+        /* ================================================================
+           Responsive — 1024px  (desktop)
+           ================================================================ */
+        @media (min-width: 1024px) {
+            .header__inner {
+                height: var(--layout-size-size-64);
+                padding: 0 var(--spacing-spacing-800);
+            }
+
+            .main {
+                padding: var(--spacing-spacing-800);
+            }
+
+            .hero__headline {
+                font-size: var(--text-size-special-story-page-headline-lg);
+            }
+
+            .story-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .story-card__headline {
+                font-size: var(--text-size-x-scale-x1);
+            }
+        }
+
+        /* ================================================================
+           Responsive — 1440px  (large desktop)
+           ================================================================ */
+        @media (min-width: 1440px) {
+            .main {
+                padding: var(--spacing-spacing-900) var(--spacing-spacing-800);
+            }
+
+            .hero {
+                gap: var(--spacing-spacing-800);
+            }
+
+            .hero__headline {
+                font-size: var(--text-size-x-scale-x4);
+            }
+
+            .hero__description {
+                font-size: var(--text-text-size-body-lg);
+            }
+
+            .section-title__text {
+                font-size: var(--text-size-x-scale-x2);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         Header
+         ============================================================ -->
+    <header class="header">
+        <div class="header__inner">
+            <!-- AP Logo -->
+            <a href="#" class="header__logo" aria-label="AP News Home">
+                <svg viewBox="0 0 36 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="36" height="40" rx="4" fill="#DA1026"/>
+                    <text x="50%" y="55%" dominant-baseline="central" text-anchor="middle"
+                          fill="#fff" font-family="sans-serif" font-weight="700" font-size="18">AP</text>
+                </svg>
+            </a>
+
+            <!-- Desktop navigation -->
+            <nav class="header__nav" aria-label="Primary">
+                <a href="#" class="header__nav-link header__nav-link--active">U.S.</a>
+                <a href="#" class="header__nav-link">World</a>
+                <a href="#" class="header__nav-link">Politics</a>
+                <a href="#" class="header__nav-link">Sports</a>
+                <a href="#" class="header__nav-link">Entertainment</a>
+                <a href="#" class="header__nav-link">Business</a>
+                <a href="#" class="header__nav-link">Science</a>
+                <a href="#" class="header__nav-link">Health</a>
+                <a href="#" class="header__nav-link">Oddities</a>
+                <a href="#" class="header__nav-link">Lifestyle</a>
+            </nav>
+
+            <!-- Utility icons -->
+            <div class="header__actions">
+                <button class="header__icon-btn" aria-label="Search">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 3a5.5 5.5 0 014.383 8.823l4.147 4.147a.75.75 0 01-1.06 1.06l-4.147-4.147A5.5 5.5 0 118.5 3zm0 1.5a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                </button>
+                <button class="header__icon-btn" aria-label="Saved stories">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 3a1 1 0 00-1 1v13.131l5.445-3.63a1 1 0 011.11 0L16 17.132V4a1 1 0 00-1-1H5z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+                </button>
+                <button class="header__icon-btn" aria-label="Account">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="7" r="3.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 17.5c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+            </div>
+
+            <!-- Mobile hamburger -->
+            <button class="header__menu-btn" aria-label="Open menu" onclick="toggleMobileNav()">
+                <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+        </div>
+
+        <!-- Mobile nav drawer -->
+        <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation">
+            <a href="#" class="mobile-nav__link">U.S.</a>
+            <a href="#" class="mobile-nav__link">World</a>
+            <a href="#" class="mobile-nav__link">Politics</a>
+            <a href="#" class="mobile-nav__link">Sports</a>
+            <a href="#" class="mobile-nav__link">Entertainment</a>
+            <a href="#" class="mobile-nav__link">Business</a>
+            <a href="#" class="mobile-nav__link">Science</a>
+            <a href="#" class="mobile-nav__link">Health</a>
+            <a href="#" class="mobile-nav__link">Oddities</a>
+            <a href="#" class="mobile-nav__link">Lifestyle</a>
+        </nav>
+    </header>
+
+    <!-- ============================================================
+         Main content
+         ============================================================ -->
+    <main class="main">
+
+        <!-- Hero / featured story -->
+        <article class="hero">
+            <div class="hero__image-wrap">
+                <div class="hero__image-placeholder" aria-hidden="true">16 : 9</div>
+            </div>
+            <div class="hero__content">
+                <span class="hero__eyebrow">U.S. News</span>
+                <h2 class="hero__headline">
+                    <a href="#">Federal reserve signals potential rate cuts amid cooling inflation data</a>
+                </h2>
+                <p class="hero__description">
+                    The Federal Reserve indicated Wednesday that interest rate reductions could
+                    begin later this year as recent economic data shows inflation continuing to
+                    ease toward its 2% target.
+                </p>
+                <div class="hero__meta">
+                    <span>By Chris Rugaber</span>
+                    <span class="hero__meta-dot"></span>
+                    <time datetime="2026-02-11">18 minutes ago</time>
+                </div>
+            </div>
+        </article>
+
+        <!-- Top Stories section -->
+        <section>
+            <div class="section-title">
+                <div class="section-title__rule"></div>
+                <h2 class="section-title__text">Top Stories</h2>
+            </div>
+
+            <div class="story-grid">
+                <!-- Card 1 -->
+                <article class="story-card">
+                    <div class="story-card__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true">3 : 2</div>
+                    </div>
+                    <div class="story-card__content">
+                        <span class="story-card__eyebrow">Politics</span>
+                        <h3 class="story-card__headline">
+                            <a href="#">Senate advances bipartisan infrastructure package with key amendments</a>
+                        </h3>
+                        <p class="story-card__description">
+                            Lawmakers reached agreement on critical spending provisions after weeks of negotiations.
+                        </p>
+                        <div class="story-card__meta">
+                            <span>Lisa Mascaro</span>
+                            <span class="story-card__meta-dot"></span>
+                            <time>45 minutes ago</time>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 2 -->
+                <article class="story-card">
+                    <div class="story-card__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true">3 : 2</div>
+                    </div>
+                    <div class="story-card__content">
+                        <span class="story-card__eyebrow">World</span>
+                        <h3 class="story-card__headline">
+                            <a href="#">Climate summit reaches landmark agreement on emissions reduction targets</a>
+                        </h3>
+                        <p class="story-card__description">
+                            More than 190 nations endorsed new binding commitments to curb greenhouse gas output.
+                        </p>
+                        <div class="story-card__meta">
+                            <span>Seth Borenstein</span>
+                            <span class="story-card__meta-dot"></span>
+                            <time>1 hour ago</time>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 3 -->
+                <article class="story-card">
+                    <div class="story-card__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true">3 : 2</div>
+                    </div>
+                    <div class="story-card__content">
+                        <span class="story-card__eyebrow">Sports</span>
+                        <h3 class="story-card__headline">
+                            <a href="#">NBA trade deadline shakeup as contenders make blockbuster deals</a>
+                        </h3>
+                        <p class="story-card__description">
+                            Several playoff teams reshaped their rosters in a flurry of last-minute transactions.
+                        </p>
+                        <div class="story-card__meta">
+                            <span>Tim Reynolds</span>
+                            <span class="story-card__meta-dot"></span>
+                            <time>2 hours ago</time>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 4 -->
+                <article class="story-card">
+                    <div class="story-card__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true">3 : 2</div>
+                    </div>
+                    <div class="story-card__content">
+                        <span class="story-card__eyebrow">Science</span>
+                        <h3 class="story-card__headline">
+                            <a href="#">NASA telescope discovers high concentration of water vapor on distant exoplanet</a>
+                        </h3>
+                        <p class="story-card__description">
+                            The finding marks a significant step in the search for potentially habitable worlds.
+                        </p>
+                        <div class="story-card__meta">
+                            <span>Marcia Dunn</span>
+                            <span class="story-card__meta-dot"></span>
+                            <time>3 hours ago</time>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- More News — compact horizontal row -->
+        <section>
+            <div class="section-title">
+                <div class="section-title__rule"></div>
+                <h2 class="section-title__text">More News</h2>
+            </div>
+
+            <div class="story-row">
+                <article class="story-row__item">
+                    <div class="story-row__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true"></div>
+                    </div>
+                    <div class="story-row__content">
+                        <span class="story-row__eyebrow">Business</span>
+                        <h3 class="story-row__headline">
+                            <a href="#">Tech stocks rally as earnings season exceeds Wall Street expectations</a>
+                        </h3>
+                        <span class="story-row__meta">4 hours ago</span>
+                    </div>
+                </article>
+
+                <article class="story-row__item">
+                    <div class="story-row__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true"></div>
+                    </div>
+                    <div class="story-row__content">
+                        <span class="story-row__eyebrow">Health</span>
+                        <h3 class="story-row__headline">
+                            <a href="#">New guidelines recommend updated screening protocols for heart disease</a>
+                        </h3>
+                        <span class="story-row__meta">5 hours ago</span>
+                    </div>
+                </article>
+
+                <article class="story-row__item">
+                    <div class="story-row__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true"></div>
+                    </div>
+                    <div class="story-row__content">
+                        <span class="story-row__eyebrow">Entertainment</span>
+                        <h3 class="story-row__headline">
+                            <a href="#">Oscar nominations announced with several first-time contenders</a>
+                        </h3>
+                        <span class="story-row__meta">6 hours ago</span>
+                    </div>
+                </article>
+
+                <article class="story-row__item">
+                    <div class="story-row__image-wrap">
+                        <div class="story-card__image-placeholder" aria-hidden="true"></div>
+                    </div>
+                    <div class="story-row__content">
+                        <span class="story-row__eyebrow">Lifestyle</span>
+                        <h3 class="story-row__headline">
+                            <a href="#">Study finds rising interest in remote work reshaping urban housing markets</a>
+                        </h3>
+                        <span class="story-row__meta">7 hours ago</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+         Footer
+         ============================================================ -->
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__logo">
+                <svg viewBox="0 0 36 40" xmlns="http://www.w3.org/2000/svg" aria-label="AP News">
+                    <rect width="36" height="40" rx="4" fill="#DA1026"/>
+                    <text x="50%" y="55%" dominant-baseline="central" text-anchor="middle"
+                          fill="#fff" font-family="sans-serif" font-weight="700" font-size="18">AP</text>
+                </svg>
+            </div>
+            <nav class="footer__links" aria-label="Footer">
+                <a href="#" class="footer__link">About</a>
+                <a href="#" class="footer__link">Contact</a>
+                <a href="#" class="footer__link">Careers</a>
+                <a href="#" class="footer__link">Terms of Use</a>
+                <a href="#" class="footer__link">Privacy</a>
+                <a href="#" class="footer__link">Cookie Settings</a>
+            </nav>
+            <div class="footer__divider"></div>
+            <p class="footer__copyright">&copy; 2026 The Associated Press. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ============================================================
+         Scripts
+         ============================================================ -->
+    <script>
+        function toggleMobileNav() {
+            var nav = document.getElementById('mobile-nav');
+            var btn = document.querySelector('.header__menu-btn');
+            var isOpen = nav.classList.toggle('is-open');
+            btn.setAttribute('aria-expanded', isOpen);
+            btn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+        }
+    </script>
+</body>
+</html>
