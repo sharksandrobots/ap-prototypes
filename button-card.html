@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Button &amp; Card Prototype</title>
     <link rel="stylesheet" href="styles/tokens.css">
+    <link rel="stylesheet" href="styles/fonts.css">
     <style>
         * {
             margin: 0;
@@ -13,14 +14,14 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: var(--font-family-primary);
             padding: var(--spacing-spacing-500);
             background-color: var(--color-backgrounds-secondary);
             color: var(--color-text-primary);
         }
 
         .container {
-            max-width: 1024px;
+            max-width: 1440px;
             margin: 0 auto;
         }
 
@@ -140,7 +141,7 @@
             padding: var(--spacing-spacing-100);
         }
 
-        /* Responsive: mobile-first, breakpoints at 390px, 768px, 1024px */
+        /* Responsive: mobile-first, breakpoints at 390px, 768px, 1024px, 1440px */
 
         /* Base (< 390px) */
         .card {
@@ -212,6 +213,26 @@
                 font-size: var(--text-size-x-scale-x3);
             }
         }
+
+        /* 1440px — large desktop */
+        @media (min-width: 1440px) {
+            .container {
+                max-width: 1200px;
+            }
+
+            .card {
+                padding: var(--spacing-spacing-900);
+                gap: var(--spacing-spacing-600);
+            }
+
+            .card__headline {
+                font-size: var(--text-size-x-scale-x4);
+            }
+
+            .card__body {
+                font-size: var(--text-text-size-body-lg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -228,7 +249,7 @@
                 A simple card built with AP News design tokens. The filled and outlined
                 button variants below use the interactive token palette for all states.
                 Resize the browser to see the responsive breakpoints at 390px, 768px,
-                and 1024px.
+                1024px, and 1440px.
             </p>
             <div class="card__divider"></div>
             <div class="card__actions">

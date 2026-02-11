@@ -1,0 +1,35 @@
+/* ==========================================================================
+   AP Var — Variable Font
+   ========================================================================== */
+
+/*
+  AP Var is a variable font supporting weight (400–700) and width
+  (condensed–normal) axes. Place the font files in ../fonts/ and
+  uncomment the @font-face blocks that match the formats you ship.
+
+  Until the hosted woff2 is available, the font-family declaration
+  below ensures every element resolves to "AP Var" first, then falls
+  back through a system sans-serif stack.
+*/
+
+/* — Uncomment when self-hosting the font files —
+@font-face {
+  font-family: 'AP Var';
+  src: url('../fonts/APVar.woff2') format('woff2-variations'),
+       url('../fonts/APVar.woff2') format('woff2');
+  font-weight: 400 700;
+  font-stretch: 75% 100%;
+  font-display: swap;
+}
+*/
+
+/* Global font-family assignment */
+:root {
+  --font-family-primary: 'AP Var', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue',
+    sans-serif;
+}
+
+html {
+  font-family: var(--font-family-primary);
+}
