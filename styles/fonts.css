@@ -33,3 +33,29 @@
 html {
   font-family: var(--font-family-primary);
 }
+/* AP Var Font */
+@font-face {
+  font-family: 'AP Var';
+  src: url('../fonts/APVarW05-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AP Var';
+  src: url('../fonts/APVarW05-Regular.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'AP Var';
+  src: url('../fonts/APVarW05-Regular.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Apply to all elements */
+* {
+  font-family: 'AP Var', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
